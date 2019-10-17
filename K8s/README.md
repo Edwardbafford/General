@@ -5,7 +5,7 @@ kubectl create -f node-ingress.yaml
 Update C:\Windows\System32\drivers\etc\hosts file with ingress ip and url or use loadbalancer ip to make request to node-app application 
   
 ## K8s Persistent Volume  
-gcloud compute disks create --size=1GiB --zone=us-central1-a mongodb  
+gcloud compute disks create --size=1GiB --zone=us-central1-a image_storage  
 kubectl create -f storageclass-fast-gcepd.yaml  
 kubectl create -f mongodb-pvc-dp.yaml  
 kubectl create -f mongodb-pod-pvc.yaml  
