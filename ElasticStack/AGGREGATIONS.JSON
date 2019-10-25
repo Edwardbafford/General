@@ -1,0 +1,53 @@
+POST /shakespeare/_search?size=2
+
+# Metric Aggs
+POST /shakespeare/_search?size=0
+{
+    "aggs" : {
+        "avg_line" : { "avg" : { "field" : "line_id" }},
+        "max_line" : { "max" : { "field" : "line_id" }},
+        "line_percentiles" : {
+            "percentiles" : {
+                "field" : "line_id" 
+            }
+        }
+    }
+}
+
+# Filter before aggs 
+POST /shakespeare/_search?size=0
+{
+    "aggs" : {
+        "t_shirts" : {
+            "filter" : { "term": { "text_entry": "king" } },
+            "aggs" : {
+                "avg_line" : { "avg" : { "field" : "line_id" } }
+            }
+        }
+    }
+}
+
+# Term Buckets
+GET /shakespeare/_search?size=0
+{
+    "aggs" : {
+        "genres" : {
+            "terms" : { "field" : "play_name" } 
+        }
+    }
+}
+
+#Nest Buckets
+GET /shakespeare/_search?size=0
+{
+    "aggs" : {
+        "genres" : {
+            "terms" : {
+                "field" : "play_name"
+            },
+            "aggs" : {
+                "avg_line" : { "avg" : { "field" : "line_id" } }
+            }
+        }
+    }
+}

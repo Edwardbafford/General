@@ -12,7 +12,7 @@ PUT /shakespeare
   }
 }
 
-#Upload Shakespear data json
+# Download Shakespear data json
 # Invoke-RestMethod "http://localhost:9200/shakespeare/_bulk?pretty" -Method Post -ContentType 'application/x-ndjson' -InFile "shakespeare.json"
 
 GET /_cat/indices?v
