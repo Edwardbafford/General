@@ -94,5 +94,5 @@ with DAG("flights_delay_etl",default_args=DEFAULT_DAG_ARGS) as dag :
     create_cluster.dag = dag
     create_cluster.set_downstream(submit_pyspark)
     submit_pyspark.set_downstream([bq_load_delays_by_flight_nums,bq_load_delays_by_distance,delete_cluster])
-    delete_cluster.set_downstream(delete_tranformed_files)
+delete_cluster.set_downstream(delete_tranformed_files)
 
