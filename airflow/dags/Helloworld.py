@@ -7,11 +7,12 @@ default_args = {
     'owner': 'manasi',
     'depends_on_past': False,
     'start_date': datetime(2016, 4, 15),
+    'schedule_interval': None,
     'email': ['manasidalvi14@gmail.com'],
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=1),
+    'retry_delay': timedelta(minutes=1)
 }
 
 dag = DAG('Helloworld', default_args=default_args)
