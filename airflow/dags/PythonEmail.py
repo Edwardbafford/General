@@ -1,39 +1,35 @@
 import os
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.utils.email import send_email
+from airflow.operators.email_operator import EmailOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python_operator import BranchPythonOperator
 
+# Main DAG Definition
+
+default_args = {
+    'owner': 'Louie',
+    'email': ['edwardbafford@go.rmc.edu'],
+    'retries': 0
+}
+
+dag = DAG(
+    'PythonEmail',
+    default_args=default_args,
+    schedule_interval='0 * * * *',
+    start_date=datetime.now().replace(microsecond=0, second=0, minute=0) - timedelta(hours=1)
+)
+
+
+# Write a number to a file
 
 def save_number(number):
     data_dir = os.getenv('DATA')
     with open(data_dir + '/number_file.txt', 'w') as number_file:
         number_file.write(str(number))
 
-
-def email_callback(**kwargs):
-    data_dir = os.getenv('DATA')
-    with open(data_dir + '/number_file.txt', 'r') as number_file:
-        content = number_file.read()
-    send_email(
-        to=['edwardbafford@go.rmc.edu'],
-        subject='Airflow Email',
-        html_content=content,
-
-    )
-
-
-default_args = {
-    'owner': 'Louie',
-    'start_date': datetime(2020, 8, 14),
-    'schedule_interval': '@hourly',
-    'email': ['edwardbafford@go.rmc.edu'],
-    'retries': 0
-}
-
-dag = DAG('PythonEmail', default_args=default_args)
 
 save_number_task = PythonOperator(
     task_id='save_number',
@@ -43,11 +39,52 @@ save_number_task = PythonOperator(
 )
 
 
-email_task = PythonOperator(
-    task_id='email_callback',
-    python_callable=email_callback,
+# Branch based off of number value
+
+def check_number(**kwargs):
+    data_dir = os.getenv('DATA')
+    with open(data_dir + '/number_file.txt', 'r') as number_file:
+        number = float(number_file.read())
+    if number >= .5:
+        return 'email_high'
+    else:
+        return 'email_low'
+
+
+check_number_task = BranchPythonOperator(
+    task_id='check_number',
+    python_callable=check_number,
     provide_context=True,
-    dag=dag,
+    dag=dag
 )
 
-save_number_task >> email_task
+# High/Low emails
+
+email_subject = 'Airflow Email'
+
+email_body = """
+  Airflow email notification: {{ params.message }}
+"""
+
+email_high_task = EmailOperator(
+    task_id='email_high',
+    to='edwardbafford@go.rmc.edu',
+    subject=email_subject,
+    html_content=email_body,
+    params={'message': 'HIGH NUMBER'},
+    dag=dag
+)
+
+
+email_low_task = EmailOperator(
+    task_id='email_low',
+    to='edwardbafford@go.rmc.edu',
+    subject=email_subject,
+    html_content=email_body,
+    params={'message': 'LOW NUMBER'},
+    dag=dag
+)
+
+# DAG dependencies
+
+save_number_task >> check_number_task >> [email_high_task, email_low_task]
