@@ -19,7 +19,7 @@ dag = DAG(
     'PythonEmail',
     default_args=default_args,
     schedule_interval='0 * * * *',
-    start_date=datetime.now().replace(microsecond=0, second=0, minute=0) - timedelta(hours=1)
+    start_date=datetime.now().replace(microsecond=0, second=0, minute=30) - timedelta(hours=1)
 )
 
 
@@ -35,7 +35,7 @@ save_number_task = PythonOperator(
     task_id='save_number',
     python_callable=save_number,
     op_kwargs={'number': random.random()},
-    dag=dag,
+    dag=dag
 )
 
 
