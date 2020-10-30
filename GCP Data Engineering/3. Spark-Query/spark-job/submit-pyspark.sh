@@ -1,1 +1,0 @@
-gcloud dataproc jobs submit pyspark gs://louie-etl/flights-etl.py --cluster=spark-dwh --region=us-east1 
