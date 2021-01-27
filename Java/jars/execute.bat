@@ -1,2 +1,2 @@
-jar cf Example-Jar.jar *
-jar tf .\Example-Jar.jar
+jar cfe Example-Jar.jar example.louie.TodoApp *
+java -jar .\Example-Jar.jar
