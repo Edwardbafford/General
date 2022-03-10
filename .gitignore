@@ -3,6 +3,7 @@ tensorflow/*
 tensorflow/
 data/
 model/
+*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
